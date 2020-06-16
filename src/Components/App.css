@@ -1,0 +1,9 @@
+html, 
+body,
+.app {
+    /* it takes entire heght of the browser */
+    height: 100vh;
+    background: #eee;
+    padding: 1em;
+
+}
