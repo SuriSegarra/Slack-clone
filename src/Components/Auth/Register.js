@@ -16,14 +16,55 @@ class Register extends React.Component {
         username: '',
         email: '',
         password: '',
-        passwordConfirmation: ''
+        passwordConfirmation: '',
+        errors: []
     }
+
+    isFormValid = () => {
+        let errors = [];
+        let error;
+
+        //make sure all our inputs are filled out 
+        if(this.isFormEmpty(this.state)){
+            //throw error
+            error = { message: 'Fill all fields' };
+            this.setState({ errors: errors.concat(error) })
+            return false; //do not execute handle submit 
+
+        } else if(!this.isPasswordValid(this.state)) {
+            //throw error
+            error = { message: 'Password is invalid' }
+            this.setState({ errors: errors.concat(error)})
+            return false;
+
+        } else {
+            //form valid. allow data to be sent to firebase 
+            return true;
+        }
+    }
+
+    isFormEmpty = ({ username, email, password, passwordConfirmation}) => {
+        return !username.length || !email.length || !password.length || !passwordConfirmation.length;
+    }
+
+    isPasswordValid = ({ password, passwordConfirmation }) => {
+        if(password.length <6 || passwordConfirmation.length < 6 ) { 
+            return false;
+        } else if (password !== passwordConfirmation) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
 
     handleChange= (e) => {
         this.setState({ [e.target.name]: e.target.value })
     }
 
     handleSubmit = (e) => {
+        //makes sure that all of the fiels are filled out
+        if(this.isFormValid()) {
         e.preventDefault();
         firebase 
         //make use of auth tools
@@ -36,6 +77,7 @@ class Register extends React.Component {
             console.log(err);
         })
     }
+}
 
     render() {
         const { username, email, password, passwordConfirmation } = this.state;
