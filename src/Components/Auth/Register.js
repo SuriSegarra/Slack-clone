@@ -57,6 +57,8 @@ class Register extends React.Component {
         }
     }
 
+    displayErrors = errors => errors.map((error, i) => <p key={i}>{error.message}</p>)
+
 
     handleChange= (e) => {
         this.setState({ [e.target.name]: e.target.value })
@@ -80,7 +82,7 @@ class Register extends React.Component {
 }
 
     render() {
-        const { username, email, password, passwordConfirmation } = this.state;
+        const { username, email, password, passwordConfirmation, errors } = this.state;
         return (
            <Grid textAlign='center' verticalAlign='middle' className='app'>
                <GridColumn style={{ maxWidth: 450 }}>
@@ -144,6 +146,16 @@ class Register extends React.Component {
                             </Button>
                        </Segment>
                    </Form>
+                   {/* //display any errors */}
+                   
+                   {errors.length > 0 && (
+                    //if is > 0, show user message
+                       <Message error>
+                           <h3>Error</h3>
+                           {/* passing errors array from state */}
+                           {this.displayErrors(errors)}
+                       </Message>
+                   )}
                     <Message>Already a user?<Link to='/login'> Login</Link></Message>
                </GridColumn>
            </Grid>
