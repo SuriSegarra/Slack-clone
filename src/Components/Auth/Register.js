@@ -126,7 +126,7 @@ handleInputError = (errors, inputName) => {
            <Grid textAlign='center' verticalAlign='middle' className='app'>
                <GridColumn style={{ maxWidth: 450 }}>
                    <Header 
-                    as='h2' 
+                    as='h1' 
                     icon
                      color='orange' 
                      textAlign='center'
