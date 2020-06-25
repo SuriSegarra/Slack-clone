@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom';
 import App from './Components/App';
 import Register from './Components/Auth/Register';
 import Login from './Components/Auth/Login';
+import Spinner from './Spinner';
 import registerServiceWorker from './registerServiceWorker';
 import firebase from './firebase';
-
 import 'semantic-ui-css/semantic.min.css';
 
 //setting up routing 
@@ -24,6 +24,7 @@ const store = createStore(rootReducer, composeWithDevTools());
 
 class Root extends React.Component{
     componentDidMount() {
+        // console.log(this.props.isLoading)
         firebase.auth().onAuthStateChanged(user => {
             if(user) {
                 this.props.setUser(user);
@@ -32,8 +33,7 @@ class Root extends React.Component{
         });
     }
     render() {
- return (
-    
+ return this.props.isLoading ? <Spinner/> : (
         <Switch>
             <Route exact path="/"  component={App}/>
             <Route path="/login"  component={Login}/>
@@ -43,8 +43,12 @@ class Root extends React.Component{
         )
     }
 }
+//we pass the maps state to props func as frost argument to get loading data from our state obj, to see when the set user action still being loaded
+const mapStateFromProps = state => ({
+    isLoading: state.user.isLoading
+});
 
-const RootWithAuth = withRouter(connect(null, { setUser })(Root));
+const RootWithAuth = withRouter(connect(mapStateFromProps, { setUser })(Root));
 
 //you can only redirect when or whithing a router 
 ReactDOM.render(
