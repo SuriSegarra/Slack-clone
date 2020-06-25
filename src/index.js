@@ -14,20 +14,22 @@ import { BrowserRouter as Router,
     Route, 
     withRouter } from 'react-router-dom';
 import { createStore } from 'redux';
-import { Provider } from 'react-redux';
+import { Provider, connect } from 'react-redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
+import rootReducer from './reducers';
+import { setUser } from './actions/index';
 
 //global state
-const store = createStore(() => {}, composeWithDevTools()); 
+const store = createStore(rootReducer, composeWithDevTools()); 
 
 class Root extends React.Component{
     componentDidMount() {
         firebase.auth().onAuthStateChanged(user => {
             if(user) {
-                //setUser(user);
+                this.props.setUser(user);
                 this.props.history.push('/');
             }
-        })
+        });
     }
     render() {
  return (
@@ -42,11 +44,11 @@ class Root extends React.Component{
     }
 }
 
-const RootWithAuth = withRouter(Root);
+const RootWithAuth = withRouter(connect(null, { setUser })(Root));
 
 //you can only redirect when or whithing a router 
 ReactDOM.render(
-<Provider>
+<Provider store={store}>
 <Router>
 <RootWithAuth />
 </Router>
