@@ -13,11 +13,18 @@ import { BrowserRouter as Router,
     Switch, 
     Route, 
     withRouter } from 'react-router-dom';
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+import { composeWithDevTools } from 'redux-devtools-extension';
+
+//global state
+const store = createStore(() => {}, composeWithDevTools()); 
 
 class Root extends React.Component{
     componentDidMount() {
         firebase.auth().onAuthStateChanged(user => {
             if(user) {
+                //setUser(user);
                 this.props.history.push('/');
             }
         })
@@ -39,7 +46,10 @@ const RootWithAuth = withRouter(Root);
 
 //you can only redirect when or whithing a router 
 ReactDOM.render(
+<Provider>
 <Router>
 <RootWithAuth />
-</Router>, document.getElementById('root'));
+</Router>
+</Provider>,
+ document.getElementById('root'));
 registerServiceWorker();
