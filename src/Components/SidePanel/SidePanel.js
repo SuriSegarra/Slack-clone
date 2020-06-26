@@ -4,6 +4,8 @@ import UserPanel from './UserPanel';
 
 export default class SidePanel extends Component {
     render() {
+        const { currentUser } = this.props;
+
         return (
            <Menu
            size='large'
@@ -12,7 +14,7 @@ export default class SidePanel extends Component {
            vertical
            style={{ background: '#4c3c4c', frontSize: '1.2rem' }}
            >
-               <UserPanel />
+               <UserPanel currentUser={currentUser}/>
            </Menu>
         )
     }
