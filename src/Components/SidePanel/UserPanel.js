@@ -6,8 +6,11 @@ export default class UserPanel extends Component {
     dropdownOptions = () => [
         {
             key: 'user',
-            text: <span>Signed In as <strong>User</strong></span>,
-            disable: true
+            text: (
+                <span>Signed in as <strong>User</strong>
+                </span>
+                ),
+            disabled: true
         },
         {
             key: 'avatar',
