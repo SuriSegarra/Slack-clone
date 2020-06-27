@@ -1,19 +1,51 @@
 import React, { Component } from 'react';
+import firebase from '../../firebase';
 import { Menu, MenuItem, Icon, Modal, ModalContent, Form, Input, FormField, Button } from 'semantic-ui-react';
 
 export default class Channels extends Component {
 
     state = {
+        user: this.props.currentUser,
         channels: [],
         channelName: '',
         channelDetails: '',
-        modal: false
+        channelsRef: firebase.database().ref('channels'),
+        modal: false,
     };
+
+    addChannel = () => {
+        const { channelsRef, channelName, channelDetails, user } = this.state;
+
+        //unique identifier for every new channel that is added
+        const key = channelsRef.push().key;
+
+        const newChannel = {
+            id: key,
+            name: channelName,
+            details: channelDetails,
+            createdBy: {
+                name: user.displayName,
+                avatar: user.photoURL
+            }
+        };
+
+        channelsRef
+        .child(key)
+        .update(newChannel)
+        .then(() => {
+            this.setState({ channelName: '', channelDetails:'' });
+            this.closeModal();
+            console.log('channel added');
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    }
 
     handleSubmit = (e) => {
         e.preventDefault();
         if(this.isFormValid(this.state)) {
-            console.log('Channel added');
+            this.addChannel();
         }
     }
 
