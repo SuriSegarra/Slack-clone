@@ -1,25 +1,78 @@
 import React, { Component } from 'react';
-import { Menu, MenuItem, Icon } from 'semantic-ui-react';
+import { Menu, MenuItem, Icon, Modal, ModalContent, Form, Input, FormField, Button } from 'semantic-ui-react';
 
 export default class Channels extends Component {
 
     state = {
-        channelss: []
-    }
+        channels: [],
+        channelName: '',
+        channelDetails: '',
+        modal: false
+    };
+
+    handleChange = e => {
+        this.setState({ [e.target.name]: e.target.value });
+    };
+
+    openModal = () => this.setState({ modal:true });
+
+    closeModal = () => this.setState({ modal:false });
 
     render() {
-        const { channelss } = this.state;
+        const { channels, modal } = this.state;
 
         return (
-            <Menu.Menu style={{ paddingBottom: '2em' }}>
-                <MenuItem>
-                <span>
-                    <Icon name='exchange'/> CHANNELsS
-                </span>
-                ({ channelss.length }) <Icon name='add'/>
-                </MenuItem>
-                {/* Channelss */}
-            </Menu.Menu>
-        )
+            <React.Fragment>
+                <Menu.Menu style={{ paddingBottom: '2em' }}>
+                    <MenuItem>
+                    <span>
+                        <Icon name='exchange'/> CHANNELS
+                    </span>{' '}
+                    ({ channels.length }) <Icon name='add' onClick={this.openModal}/>
+                    </MenuItem>
+                    {/* channels */}
+                </Menu.Menu>
+
+                {/* add channel modal */}
+                <Modal basic open={modal} onClose={this.closeModal}>
+                    <Modal.Header>
+                        Add a channel
+                    </Modal.Header>
+                    <ModalContent>
+                        <Form>
+                            <FormField>
+                                <Input
+                                    fluid
+                                    label='Name of Channel'
+                                    name='channelName'
+                                    onChange={this.handleChange}
+                                />
+                            </FormField>
+
+                            <FormField>
+                                <Input
+                                    fluid
+                                    label='About the channel'
+                                    name='channelDetails'
+                                    onChange={this.handleChange}
+                                />
+                            </FormField>
+                        </Form>
+                    </ModalContent>
+
+                    <Modal.Actions>
+                        <Button color='green' inverted>
+                            <Icon name='checkmark'/>
+                            Add
+                        </Button>
+                        <Button color='red' inverted
+                        onClick={this.closeModal}>
+                            <Icon name='remove'/>
+                            Cancel
+                        </Button>
+                    </Modal.Actions>
+                </Modal>
+            </React.Fragment>
+        );
     }
 }
