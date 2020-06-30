@@ -7,7 +7,6 @@ import { Comment, CommentAvatar, CommentContent, CommentAuthor, CommentMetadata,
 const isOnMessage = (message, user) => {
     return message.user.id === user.uid ? 'message__self' : '';
 };
-
 // it will taje the message time stamp whrn the message was created and converted it into a time from the current moment
 const timeFromNow = timestamp => moment(timestamp).fromNow();
 
