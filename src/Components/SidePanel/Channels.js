@@ -20,6 +20,10 @@ class Channels extends Component {
     componentDidMount() {
         this.addListeners();
     }
+        //when we go to a different we will remove those listener that we set up so we're not listening for an event thats not going to take place 
+    componentWillUnmount() {
+        this.removeListeners();
+    }
 
     addListeners = () => {
         let loadedChannels = [];
@@ -28,6 +32,10 @@ class Channels extends Component {
             this.setState({ channels: loadedChannels }, () => this.setFirstChannel());
             
         });
+    };
+
+    removeListeners = () => {
+        this.state.channelsRef.off();
     };
 
     //it will take first channel in array or channels and put it on GS 
