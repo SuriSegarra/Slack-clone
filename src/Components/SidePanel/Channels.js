@@ -37,7 +37,8 @@ class Channels extends Component {
         //if its out first time loading the page and if we have more than no channels, 
         if(this.state.firstLoad && this.state.channels.length > 0) {
             // we going to call set Current channel actoin and pass in the first channel
-            this.props.setCurrentChannel(firstChannel)
+            this.props.setCurrentChannel(firstChannel);
+            this.setActiveChannel(firstChannel)
         }
         // we setState in order to set the first load to false 
         this.setState({ firstLoad: false });
