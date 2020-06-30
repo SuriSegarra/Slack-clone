@@ -19,11 +19,27 @@ const user_reducer = (state = initialUserState, action) => {
             }
         case actionTypes.CLEAR_USER:
             return {
-                ...initialUserState,
+                ...state,
                 isLoading: false
             }
             //if it doesnt match the given action, its going to return state as it was 
             default: 
+            return state;
+    }
+}
+
+const initialChannelState = {
+    currentChannel: null
+};
+
+const channel_reducer = (state = initialChannelState, action) => {
+    switch (action.type){
+        case actionTypes.SET_CURRENT_CHANNEL:
+            return {
+                ...state,
+                currentChannel: action.payload.currentChannel
+            }
+        default:
             return state;
     }
 }
@@ -35,7 +51,8 @@ const user_reducer = (state = initialUserState, action) => {
 //within the obs that it takes we can determine that user reducer will be updating and put it state values on this user property 
 
 const rootReducer = combineReducers({
-    user: user_reducer
+    user: user_reducer,
+    channel: channel_reducer
 });
 
 export default rootReducer;
