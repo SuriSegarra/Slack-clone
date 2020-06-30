@@ -13,6 +13,7 @@ class Channels extends Component {
         channelDetails: '',
         channelsRef: firebase.database().ref('channels'),
         modal: false,
+        firstLoad: true
     };
 
     componentDidMount() {
@@ -23,10 +24,23 @@ class Channels extends Component {
         let loadedChannels = [];
         this.state.channelsRef.on('child_added', snap => {
             loadedChannels.push(snap.val());
-            this.setState({ channels: loadedChannels });
+            this.setState({ channels: loadedChannels }, () => this.setFirstChannel());
             
-        })
-    }
+        });
+    };
+
+    //it will take first channel in array or channels and put it on GS 
+    setFirstChannel = () => {
+        //it takes the channels array and grab the first element 
+        const firstChannel = this.state.channels[0];
+        //if its out first time loading the page and if we have more than no channels, 
+        if(this.state.firstLoad && this.state.channels.length > 0) {
+            // we going to call set Current channel actoin and pass in the first channel
+            this.props.setCurrentChannel(firstChannel)
+        }
+        // we setState in order to set the first load to false 
+        this.setState({ firstLoad: false });
+    };
 
     addChannel = () => {
         const { channelsRef, channelName, channelDetails, user } = this.state;
