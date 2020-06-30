@@ -22,6 +22,7 @@ export default class Channels extends Component {
         this.state.channelsRef.on('child_added', snap => {
             loadedChannels.push(snap.val());
             this.setState({ channels: loadedChannels });
+            
         })
     }
 
@@ -64,16 +65,17 @@ export default class Channels extends Component {
     handleChange = e => {
         this.setState({ [e.target.name]: e.target.value });
     };
-
+    
     displayChannels = channels  => {
-        channels.length > 0 && channels.map(channel => (
+        return channels.length > 0 && channels.map(channel => (
             <Menu.Item
                 key={channel.id}
                 onClick={() => console.log(channel)}
                 name={channel.name}
-                style={{ opacity: 0.7 }}
-            >
-                # {channel.name}
+                style={{ opacity: 0.7}}
+                >
+               # {channel.name}
+                {/* {console.log(channel.name)} */}
             </Menu.Item>
         ))
     }
@@ -97,7 +99,7 @@ export default class Channels extends Component {
                     ({ channels.length }) <Icon name='add' onClick={this.openModal}/>
                     </MenuItem>
                     {/* channels */}
-                {this.displayChannels(channels)}
+                    {this.displayChannels(channels)}
                 </Menu.Menu>
 
                 {/* add channel modal */}
@@ -129,7 +131,7 @@ export default class Channels extends Component {
 
                     <Modal.Actions>
                         <Button color='green' inverted
-                        onClick={this.handleSubmit}>
+                         onClick={this.handleSubmit}> 
                             <Icon name='checkmark'/>
                             Add
                         </Button>
