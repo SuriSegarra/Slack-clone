@@ -7,6 +7,7 @@ import { Menu, MenuItem, Icon, Modal, ModalContent, Form, Input, FormField, Butt
 class Channels extends Component {
 
     state = {
+        activeChannel: '',
         user: this.props.currentUser,
         channels: [],
         channelName: '',
@@ -83,7 +84,13 @@ class Channels extends Component {
     };
 
     changeChannel = channel => {
+        //takes whichs channel we're passin to change the channel
+        this.setActiveChannel(channel);
         this.props.setCurrentChannel(channel);
+    };
+
+    setActiveChannel = channel => {
+        this.setState({ activeChannel: channel.id });
     }
 
     
@@ -94,6 +101,7 @@ class Channels extends Component {
                 onClick={() => this.changeChannel(channel)}
                 name={channel.name}
                 style={{ opacity: 0.7}}
+                active={channel.id === this.state.activeChannel}
                 >
                # {channel.name}
                 {/* {console.log(channel.name)} */}
