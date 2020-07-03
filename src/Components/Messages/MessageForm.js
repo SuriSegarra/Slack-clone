@@ -65,6 +65,10 @@ export default class MessageForm extends Component {
                 errros: this.state.errors.concat({ message: 'Add a message' })
             })
         }
+    };
+
+    uploadFile = (file, metadata) => {
+        console.log(file, metadata);
     }
 
     render() {
@@ -104,6 +108,7 @@ export default class MessageForm extends Component {
                     <FileModal
                         modal={modal}
                         closeModal={this.closeModal}
+                        uploadFile={this.uploadFile}
                     />
                 </Button.Group>
           </Segment>
