@@ -4,7 +4,8 @@ import { Progress } from 'semantic-ui-react';
 
 
 const ProgressBar = ({ uploadState, percentUploaded }) => (
-    uploadState && (
+    // as long the images being uploaded will show the progress once its done it will go away
+    uploadState === 'uploading' && (
         <Progress
             className='progress__bar'
             percent={percentUploaded}
