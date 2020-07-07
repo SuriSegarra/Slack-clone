@@ -12,7 +12,7 @@ export default class Messages extends Component {
         messagesLoading: true,
         channel: this.props.currentChannel,
         user: this.props.currentUser,
-
+        numUniqueUsers: ''
     };
     // TO check if we have a value in our gs for currentChannel and currentUser 
     componentDidMount() {
@@ -35,8 +35,21 @@ export default class Messages extends Component {
                 messages: loadedMessages,
                 messagesLoading: false 
             });
+            this.countUniqueUsers(loadedMessages);
         });
     };
+
+    countUniqueUsers = messages => {
+        const uniqueUsers = messages.reduce((acc, message) => {
+            if (!acc.includes(message.user.name)) {
+                //if it doesnt includea certain users name then well add it to our acc 
+                acc.push(message.user.name);
+            }
+            return acc;
+        }, []);
+        const numUniqueUsers = `${uniqueUsers.length} users`;
+        this.setState({ numUniqueUsers });
+        }
 
     displayMessages = messages => {
       return  messages.length > 0 && messages.map(message => (
@@ -49,13 +62,15 @@ export default class Messages extends Component {
     };
 
     displayChannelName = channel => channel ? `#${channel.name}` : '';
+
     render() {
-        const { messagesRef, messages, channel, user } = this.state;
+        const { messagesRef, messages, channel, user, numUniqueUsers} = this.state;
 
         return (
             <React.Fragment>
                 <MessagesHeader
                 channelName={this.displayChannelName(channel)}
+                numUniqueUsers={numUniqueUsers}
                 />
 
                 <Segment>
