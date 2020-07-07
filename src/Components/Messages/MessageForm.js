@@ -4,6 +4,7 @@ import uuidv4 from 'uuid/v4';
 import { Segment, Button, Input } from 'semantic-ui-react';
 
 import FileModal from './FileModal';
+import ProgressBar from './ProgressBar';
 
 export default class MessageForm extends Component {
     state = {
@@ -79,12 +80,14 @@ export default class MessageForm extends Component {
     uploadFile = (file, metadata) => {
        const pathToUpload = this.state.channel.id;
        const ref = this.props.messagesRef;
+       //unique id youll never be repeat 
        const filePath = `chat/public/${uuidv4()}.jpg`;
 
        this.setState({
            uploadState: 'uploading',
            uploadTask: this.state.storageRef.child(filePath).put(file, metadata)
        },
+       //listen to the percent of the file that was uploaded and set the state with that percentage 
         () => {
             this.state.uploadTask.on('state_changed', snap => {
                 const percentUploaded = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
@@ -133,7 +136,8 @@ export default class MessageForm extends Component {
 
 
     render() {
-        const { errors, message, loading, modal } = this.state;
+        //prettier-ignore
+        const { errors, message, loading, modal, uploadState, percentUploaded } = this.state;
 
         return (
           <Segment className='message__form'>
@@ -166,12 +170,16 @@ export default class MessageForm extends Component {
                         labelPosition='right'
                         icon='cloud upload'
                     />
+                </Button.Group>
                     <FileModal
                         modal={modal}
                         closeModal={this.closeModal}
                         uploadFile={this.uploadFile}
                     />
-                </Button.Group>
+                    <ProgressBar 
+                        uploadState={uploadState}
+                        percentUploaded={percentUploaded}
+                    />
           </Segment>
         )
     }
