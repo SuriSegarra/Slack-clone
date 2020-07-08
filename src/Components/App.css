@@ -5,7 +5,10 @@ body,
     height: 100vh;
     background: #eee;
     padding: 1em;
-
+}
+/* sidePanel.js */
+.menu {
+padding-bottom: 2em;
 }
 
 /* Messages */
@@ -39,5 +42,4 @@ body,
 /* progress bar */
 .progress__bar {
     margin: 0.3em 0 0 0 !important;
-    
 }
