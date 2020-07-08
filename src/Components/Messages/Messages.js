@@ -64,7 +64,8 @@ export default class Messages extends Component {
             return acc;
         }, []);
         this.setState({ searchResults });
-    }
+        setTimeout(() => this.setState({ searchLoading: false }), 1000);
+    };
 
     countUniqueUsers = messages => {
         const uniqueUsers = messages.reduce((acc, message) => {
@@ -92,7 +93,7 @@ export default class Messages extends Component {
     displayChannelName = channel => channel ? `#${channel.name}` : '';
 
     render() {
-        const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults } = this.state;
+        const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults, searchLoading } = this.state;
 
         return (
             <React.Fragment>
@@ -100,6 +101,7 @@ export default class Messages extends Component {
                 channelName={this.displayChannelName(channel)}
                 numUniqueUsers={numUniqueUsers}
                 handleSearchChange={this.handleSearchChange}
+                searchLoading={searchLoading}
                 />
 
                 <Segment>
