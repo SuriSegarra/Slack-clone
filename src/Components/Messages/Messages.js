@@ -50,11 +50,15 @@ export default class Messages extends Component {
     }
 
     handleSearchMessages = () => {
+        //we spread all the values messages and assign it to channelMessages to not mutate the original messages array 
         const channelMessages = [...this.state.messages];
         //g = global, match all instances of the pattern in a string, not just one i = case-insensitive
         const regex = new RegExp(this.state.searchTerm, 'gi');
         const searchResults = channelMessages.reduce((acc, message) => {
-            if(message.content && message.content.match(regex)) {
+            if (
+                (message.content && message.content.match(regex)) || 
+                message.user.name.match(regex)
+            ) {
                 acc.push(message);
             }
             return acc;
