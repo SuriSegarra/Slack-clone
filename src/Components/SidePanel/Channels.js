@@ -186,5 +186,7 @@ class Channels extends Component {
     }
 }
 
-export default connect(null, { setCurrentChannel, setPrivateChannel }
-    )(Channels);
+export default connect(
+    null, 
+    { setCurrentChannel, setPrivateChannel }
+    )(Channels); 

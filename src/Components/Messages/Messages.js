@@ -7,6 +7,8 @@ import firebase from '../../firebase';
 
 export default class Messages extends Component {
     state = {
+        privateChannel: this.props.isPrivateChannel,
+        privateMessagesRef: firebase.database().ref('privateMessages'),
         messagesRef: firebase.database().ref('messages'),
         messages: '',
         messagesLoading: true,
@@ -32,7 +34,8 @@ export default class Messages extends Component {
 // we're going to listen for any new messages added for a given channel 
     addMessageListener = channelId => {
         let loadedMessages = [];
-        this.state.messagesRef.child(channelId).on('child_added', snap => {
+        const ref = this.getMessagesRef();
+        ref.child(channelId).on('child_added', snap => {
             loadedMessages.push(snap.val());
             this.setState({
                 messages: loadedMessages,
@@ -40,6 +43,12 @@ export default class Messages extends Component {
             });
             this.countUniqueUsers(loadedMessages);
         });
+    };
+// where all the private messages from private messages will be stored
+    getMessagesRef = () => {
+        const { messagesRef, privateMessagesRef, privateChannel } = this.state;
+        // if its a private channel, we're going to use private messages , otherwise messagesRef (public)
+        return privateChannel ? privateMessagesRef : messagesRef;
     };
 
     handleSearchChange = e => {
@@ -90,10 +99,16 @@ export default class Messages extends Component {
         ));
     };
 
-    displayChannelName = channel => channel ? `#${channel.name}` : '';
+    displayChannelName = channel => {
+        //if we pass a channle and then if so, check if is private, if so @, otherwise # for public channle 
+        return channel ? `${this.state.privateChannel ? '@' : '#'}${channel.name}` :
+        // if its not channel, return empty string
+        '';
+    };
+    
 
     render() {
-        const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults, searchLoading } = this.state;
+        const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults, searchLoading, privateChannel } = this.state;
 
         return (
             <React.Fragment>
@@ -102,6 +117,7 @@ export default class Messages extends Component {
                 numUniqueUsers={numUniqueUsers}
                 handleSearchChange={this.handleSearchChange}
                 searchLoading={searchLoading}
+                isPrivateChannel={privateChannel}
                 />
 
                 <Segment>
@@ -114,6 +130,8 @@ export default class Messages extends Component {
                     messagesRef={messagesRef}
                     currentChannel={channel}
                     currentUser={user}
+                    isPrivateChannel={privateChannel}
+                    getMessagesRef= {this.getMessagesRef}
                 />
             </React.Fragment>
         )

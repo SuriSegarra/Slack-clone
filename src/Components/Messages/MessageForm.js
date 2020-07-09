@@ -48,13 +48,13 @@ export default class MessageForm extends Component {
 
     sendMessage = () => {
         //restructuring from props in order to create a message in our db 
-        const { messagesRef } = this.props;
+        const { getMessagesRef } = this.props;
         //holds content of our messages
         const { message, channel } = this.state
 
         if(message) {
             this.setState({ loading: true })
-            messagesRef
+            getMessagesRef()
             // to specify which channels we are adding this messgae to 
             .child(channel.id)
             .push()
@@ -76,12 +76,20 @@ export default class MessageForm extends Component {
             })
         }
     };
+// determines which path we should use based on whetehr the channel is private or public
+    getPath = () => {
+        if(this.props.isPrivateChannel) {
+            return `chat/private-${this.state.channel.id}`;
+        } else {
+            return 'chat/public';
+        }
+    }
 
     uploadFile = (file, metadata) => {
        const pathToUpload = this.state.channel.id;
-       const ref = this.props.messagesRef;
+       const ref = this.props.getMessagesRef();
        //unique id youll never be repeat 
-       const filePath = `chat/public/${uuidv4()}.jpg`;
+       const filePath = `${this.getPath()}/${uuidv4()}.jpg`;
 
        this.setState({
            uploadState: 'uploading',
