@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import firebase from '../../firebase';
+import { connect } from 'react-redux';
+import { setCurrentChannel, setPrivateChannel } from '../../actions';
 import { Menu, Icon } from 'semantic-ui-react';
 
-export default class DirectMessages extends Component {
+class DirectMessages extends Component {
     state = {
         user: this.props.currentUser,
         users: [],
@@ -29,17 +31,6 @@ export default class DirectMessages extends Component {
             }
         });
 
-        // addListeners = currentUserUid => {
-        //     let loadedUsers = [];
-        //     this.state.usersRef.on("child_added", snap => {
-        //       if (currentUserUid !== snap.key) {
-        //         let user = snap.val();
-        //         user["uid"] = snap.key;
-        //         user["status"] = "offline";
-        //         loadedUsers.push(user);
-        //         this.setState({ users: loadedUsers });
-        //       }
-        //     });
 //give us better info about each user in our app
         this.state.connectedRef.on('value', snap => {
             if(snap.val() === true) {
@@ -86,6 +77,26 @@ export default class DirectMessages extends Component {
 
     isUserOnline = user => user.status === 'online';
 
+    changeChannel = user => {
+        const channelId = this.getChannelId(user.uid);
+        const channelData = {
+            id: channelId, 
+            name: user.name,
+        };
+        // take channel data and passed it to our channel action 
+        this.props.setCurrentChannel(channelData);
+        this.props.setPrivateChannel(true);
+    };
+
+    getChannelId = userId => {
+        //we are going to compare the user ID that we clicked on with the current user id 
+        const currentUserId = this.state.user.uid;
+        return userId < currentUserId ?
+        // this is to create the path of the channel otherwise we put the current user ID and then the user ID that we clicked on 
+        // allows to make a unique channle identifier for every DM channel 
+         `${userId}/${currentUserId}` : `${currentUserId}/${userId}`;
+    };
+
     render() {
         const { users } = this.state;
 
@@ -103,7 +114,7 @@ export default class DirectMessages extends Component {
                {users.map(user => (
                    <Menu.Item
                     key={user.uid}
-                    onClick={() => console.log(user)}
+                    onClick={() => this.changeChannel(user)}
                     stye={{ opacity: 0.7, fontStyle: 'italic' }}
                    >
                        <Icon
@@ -117,3 +128,6 @@ export default class DirectMessages extends Component {
         )
     }
 }
+
+export default connect(null, { setCurrentChannel, setPrivateChannel }
+    )(DirectMessages);
