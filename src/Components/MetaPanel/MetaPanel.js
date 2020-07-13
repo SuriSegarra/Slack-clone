@@ -4,7 +4,8 @@ import { Segment, Accordion, Header, Icon } from 'semantic-ui-react';
 
 export default class MetaPanel extends Component {
     state = {
-        activeIndex: 0
+        activeIndex: 0,
+        privateChannel: this.props.isPrivateChannel
     };
 
     // when we click on a title, we're going to set the active index and therefore (por lo tanto)
@@ -18,7 +19,9 @@ export default class MetaPanel extends Component {
     };
 
     render() {
-        const { activeIndex } = this.state;
+        const { activeIndex, privateChannel } = this.state;
+        
+        if (privateChannel) return null;
 
         return (
            <Segment>
