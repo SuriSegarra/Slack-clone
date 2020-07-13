@@ -13,6 +13,7 @@ export default class Messages extends Component {
         messages: '',
         messagesLoading: true,
         channel: this.props.currentChannel,
+        isChannelStarred: false,
         user: this.props.currentUser,
         numUniqueUsers: '',
         searchTerm: '',
@@ -56,7 +57,21 @@ export default class Messages extends Component {
             searchTerm: e.target.value,
             searchLoading: true 
         }, () => this.handleSearchMessages());
-    }
+    };
+
+    handleStar = () => {
+        this.setState(prevState => ({ 
+            isChannelStarred: !prevState.isChannelStarred
+        }), () => this.starChannel());
+    };
+
+    starChannel = () => {
+        if(this.state.isChannelStarred) {
+            console.log('star');
+        } else {
+            console.log('unstar');
+        }
+    };
 
     handleSearchMessages = () => {
         //we spread all the values messages and assign it to channelMessages to not mutate the original messages array 
@@ -108,7 +123,7 @@ export default class Messages extends Component {
     
 
     render() {
-        const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults, searchLoading, privateChannel } = this.state;
+        const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults, searchLoading, privateChannel, isChannelStarred } = this.state;
 
         return (
             <React.Fragment>
@@ -118,6 +133,8 @@ export default class Messages extends Component {
                 handleSearchChange={this.handleSearchChange}
                 searchLoading={searchLoading}
                 isPrivateChannel={privateChannel}
+                handleStar={this.handleStar}
+                isChannelStarred={isChannelStarred}
                 />
 
                 <Segment>
