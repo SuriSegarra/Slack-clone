@@ -1,11 +1,12 @@
 // includes info about the channel that users currently on
 import React, { Component } from 'react';
-import { Segment, Accordion, Header, Icon } from 'semantic-ui-react';
+import { Segment, Accordion, Header, Icon, Image } from 'semantic-ui-react';
 
 export default class MetaPanel extends Component {
     state = {
+        channel: this.props.currentChannel,
+        privateChannel: this.props.isPrivateChannel,
         activeIndex: 0,
-        privateChannel: this.props.isPrivateChannel
     };
 
     // when we click on a title, we're going to set the active index and therefore (por lo tanto)
@@ -19,14 +20,17 @@ export default class MetaPanel extends Component {
     };
 
     render() {
-        const { activeIndex, privateChannel } = this.state;
-        
+        const { activeIndex, privateChannel, channel } = this.state;
+        // to hide metaPanel whenever we are in a private channel
         if (privateChannel) return null;
 
+        // I was receiving channel is  null so I put this. The problem is the render and the firebase API. Is async by the time it comes up the first time, channel is undefined. so since it comes undifenied it comes as an error. 
+        // if we dont have a channel, return null 
+        // it takes a certain amount of time for in our GS the channel data to be said 
         return (
-           <Segment>
+           <Segment loading={!channel}>
                <Header as='h3' attached='top'>
-                   About the # Channel
+                   About the # {channel && channel.name}
                </Header>
                <Accordion styled attached='true'>
                 <Accordion.Title
@@ -39,7 +43,7 @@ export default class MetaPanel extends Component {
                     Channel Details
                 </Accordion.Title>
                 <Accordion.Content active={activeIndex === 0}>
-                    details 
+                    {channel && channel.details}
                 </Accordion.Content>
 
                 <Accordion.Title
@@ -65,7 +69,8 @@ export default class MetaPanel extends Component {
                    Created By 
                 </Accordion.Title>
                 <Accordion.Content active={activeIndex === 2}>
-                    creator 
+                    <Image src={channel && channel.createdBy.avatar}/>
+                    {channel && channel.createdBy.name} 
                 </Accordion.Content>
                </Accordion>
            </Segment>
