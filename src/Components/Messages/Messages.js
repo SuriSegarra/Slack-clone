@@ -15,6 +15,7 @@ export default class Messages extends Component {
         channel: this.props.currentChannel,
         isChannelStarred: false,
         user: this.props.currentUser,
+        usersRef: firebase.database().ref('users'),
         numUniqueUsers: '',
         searchTerm: '',
         searchLoading: false,
@@ -26,6 +27,7 @@ export default class Messages extends Component {
 
         if(channel && user) {
             this.addListeners(channel.id);
+            this.addUserStarsListener(channel.id, user.uid)
         }
     }
 
@@ -43,6 +45,20 @@ export default class Messages extends Component {
                 messagesLoading: false 
             });
             this.countUniqueUsers(loadedMessages);
+        });
+    };
+
+    addUserStarsListener = (channelId, userId) => {
+        this.state.usersRef 
+        .child(userId)
+        .child('starred')
+        .once('value')
+        .then(data => {
+            if(data.val() !== null) {
+                const channelIds = Object.keys(data.val());
+                const prevStarred = channelIds.includes(channelId);
+                this.setState({ isChannelStarred: prevStarred });
+            }
         });
     };
 // where all the private messages from private messages will be stored
@@ -67,9 +83,27 @@ export default class Messages extends Component {
 
     starChannel = () => {
         if(this.state.isChannelStarred) {
-            console.log('star');
+            this.state.usersRef
+            .child(`${this.state.user.uid}/starred`)
+            .update({
+                [this.state.channel.id]: {
+                    name: this.state.channel.name,
+                    details: this.state.channel.details,
+                    createdBy: {
+                        name: this.state.channel.createdBy.name, 
+                        avatar: this.state.channel.createdBy.avatar
+                    }
+                }
+            });
         } else {
-            console.log('unstar');
+            this.state.usersRef
+            .child(`${this.state.user.uid}/starred`)
+            .child(this.state.channel.id)
+            .remove(err => {
+                if (err !== null) {
+                    console.error(err);
+                }
+            })
         }
     };
 
