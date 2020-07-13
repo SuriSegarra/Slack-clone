@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
+import { Segment, Comment } from 'semantic-ui-react';
+import firebase from '../../firebase';
+import { connect } from 'react-redux';
+import { setUserPosts } from '../../actions';
+
 import MessagesHeader from './MessagesHeader';
 import MessageForm from './MessageForm';
 import Message from './Message';
-import { Segment, Comment } from 'semantic-ui-react';
-import firebase from '../../firebase';
 
-export default class Messages extends Component {
+class Messages extends Component {
     state = {
         privateChannel: this.props.isPrivateChannel,
         privateMessagesRef: firebase.database().ref('privateMessages'),
@@ -175,7 +178,8 @@ export default class Messages extends Component {
                 }
             } return acc;
         }, {});
-        console.log(userPosts);
+        // this action executes setUserPosts. this is to put it in GS
+        this.props.setUserPosts(userPosts);
     };
 
     displayChannelName = channel => {
@@ -217,4 +221,6 @@ export default class Messages extends Component {
             </React.Fragment>
         )
     }
-}
+};
+
+export default connect(null, { setUserPosts })(Messages);
