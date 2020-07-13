@@ -52,7 +52,7 @@ export default class MetaPanel extends Component {
                 onClick={this.setActiveIndex}
                 >
                     <Icon name='dropdown' />
-                    <Icon name='user cirlce' />
+                    <Icon name='user circle' />
                     Top Posters 
                 </Accordion.Title>
                 <Accordion.Content active={activeIndex === 1}>

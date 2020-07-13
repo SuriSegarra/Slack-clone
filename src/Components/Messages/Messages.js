@@ -45,6 +45,7 @@ export default class Messages extends Component {
                 messagesLoading: false 
             });
             this.countUniqueUsers(loadedMessages);
+            this.countUserPost(loadedMessages);
         });
     };
 // takes both values in order to get all of the channels and related information about the channels that the user has start
@@ -158,6 +159,23 @@ export default class Messages extends Component {
                 user={this.state.user}
             />
         ));
+    };
+
+    countUserPost = messages => {
+        let userPosts = messages.reduce((acc, message) => {
+            // check to the body of produce wether there is a prop on the acc obj with the name of the current message user name if so were going to take the obj and increment its count by 1 
+            if(message.user.name in acc) {
+                acc[message.user.name].count += 1;
+                // otherwise we are going to add a new obj on to the acc obj 
+            } else {
+                acc[message.user.name] = {
+                    avatar: message.user.avatar,
+                    // since this is the forst time finding a message with the given username
+                    count: 1
+                }
+            } return acc;
+        }, {});
+        console.log(userPosts);
     };
 
     displayChannelName = channel => {
