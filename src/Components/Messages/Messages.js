@@ -47,16 +47,24 @@ export default class Messages extends Component {
             this.countUniqueUsers(loadedMessages);
         });
     };
-
+// takes both values in order to get all of the channels and related information about the channels that the user has start
     addUserStarsListener = (channelId, userId) => {
         this.state.usersRef 
+        // select child based on the user's id 
         .child(userId)
+        // to get the entire start prop
         .child('starred')
+        // to get its value 
         .once('value')
+        // get data...
         .then(data => {
+            // make sure we have a value for the starred prop
             if(data.val() !== null) {
+                // get all the channels ID that a given user has saved and get an arr of them 
                 const channelIds = Object.keys(data.val());
+                // take arr of id and with includes method, see if our given channels ID is present within it 
                 const prevStarred = channelIds.includes(channelId);
+                // if it finds that within the arr it includes finds it rturn value of true and update channelStarred based on the previousStarred var
                 this.setState({ isChannelStarred: prevStarred });
             }
         });
@@ -84,9 +92,12 @@ export default class Messages extends Component {
     starChannel = () => {
         if(this.state.isChannelStarred) {
             this.state.usersRef
+            // select given child of that ref
             .child(`${this.state.user.uid}/starred`)
+            // obj dynamically change the idea of the channel and it's related data
             .update({
                 [this.state.channel.id]: {
+                    // obj props
                     name: this.state.channel.name,
                     details: this.state.channel.details,
                     createdBy: {
@@ -96,6 +107,7 @@ export default class Messages extends Component {
                 }
             });
         } else {
+            // for every channel that we store we're adding a new channel ID with all the information about it 
             this.state.usersRef
             .child(`${this.state.user.uid}/starred`)
             .child(this.state.channel.id)
