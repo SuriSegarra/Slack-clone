@@ -1,4 +1,5 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
+import firebase from '../../firebase';
 import { Sidebar, Menu, Divider, Button, Modal, Icon, Label, Segment } from 'semantic-ui-react';
 import { SliderPicker } from 'react-color';
 
@@ -6,12 +7,41 @@ export default class ColorPanel extends Component {
     state = {
         modal: false,
         primary: '',
-        secondary: ''
+        secondary: '',
+        user: this.props.currentUser,
+        usersRef: firebase.database().ref('users')
     };
 
     handleChangePrimary = color => this.setState({ primary: color.hex });
 
     handleChangeSecondary = color => this.setState({ secondary: color.hex });
+
+    // validation to make sure that we have values for both primary color and secondary color in state
+    handleSaveColors = () => {
+        if(this.state.primary && this.state.secondary) {
+            // if we have values for both, execute fucntion saveColors and pass the values of Primary and Secondary
+            this.saveColors(this.state.primary, this.state.secondary);
+        }
+    };
+
+    // we reach of to firebase using usersRef
+    saveColors = (primary, secondary) => {
+        this.state.usersRef
+            // add child with currentUser id 
+            .child(`${this.state.user.uid}/colors`)
+            // push uid onto this new prop
+            .push()
+            // push obj with both the primary and secondary colors that we are getting from the params of save colors 
+            .update({
+                primary, secondary
+            })
+            .then(() => {
+                console.log('colors added');
+                this.closeModal();
+            })
+            .catch(err => console.error(err));
+    };
+
 
     openModal = () => this.setState({ modal: true });
 
@@ -48,7 +78,7 @@ export default class ColorPanel extends Component {
                         </Segment>
                     </Modal.Content>
                     <Modal.Actions>
-                        <Button color='green' inverted>
+                        <Button color='green' inverted onClick={this.handleSaveColors}>
                             <Icon name='checkmark'/> Save Colors 
                         </Button>
                         <Button color='red' inverted onClick={this.closeModal}>
