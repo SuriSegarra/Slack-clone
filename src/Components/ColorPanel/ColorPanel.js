@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import firebase from '../../firebase';
+import { connect } from 'react-redux';
+import { setColors } from '../../actions';
+
 import { Sidebar, Menu, Divider, Button, Modal, Icon, Label, Segment } from 'semantic-ui-react';
 import { SliderPicker } from 'react-color';
 
-export default class ColorPanel extends Component {
+class ColorPanel extends Component {
     state = {
         modal: false,
         primary: '',
@@ -70,7 +73,10 @@ export default class ColorPanel extends Component {
             // we're going to pull of the index of the color we're iterating over and set it as the key of the fragment 
             <React.Fragment key={i}>
                 <Divider />
-                <div className='color__container'>
+                <div 
+                    className='color__container' 
+                    onClick={() => this.props.setColors(color.primary, color.secondary)}
+                >
                     <div className='color__square' style={{background: color.primary}}>
                         <div className='color__overlay' style={{background: color.secondary}}></div>
                     </div>
@@ -126,4 +132,6 @@ export default class ColorPanel extends Component {
             </Sidebar>
         )
     }
-}
+};
+
+export default connect(null, {setColors})(ColorPanel)

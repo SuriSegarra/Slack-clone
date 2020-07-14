@@ -54,6 +54,24 @@ const channel_reducer = (state = initialChannelState, action) => {
         default:
             return state;
     }
+};
+
+const initialColorState = {
+    primaryColor: '',
+    secondaryColor:''
+}
+
+const colors_reducer = (state = initialColorState, action) => {
+    //will swtich based on the action type
+    switch (action.type) {
+        case actionTypes.SET_COLORS:
+            return {
+                primaryColor: action.payload.primaryColor,
+                secondaryColor: action.payload.secondaryColor
+            }
+        default: 
+        return state;
+    }
 }
 
 //want reducer functions to only operare on a certain part of state.
@@ -64,7 +82,8 @@ const channel_reducer = (state = initialChannelState, action) => {
 
 const rootReducer = combineReducers({
     user: user_reducer,
-    channel: channel_reducer
+    channel: channel_reducer,
+    colors: colors_reducer
 });
 
 
