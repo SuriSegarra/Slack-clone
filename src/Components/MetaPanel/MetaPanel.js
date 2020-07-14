@@ -22,8 +22,14 @@ export default class MetaPanel extends Component {
     formatCount = num => (num > 1 || num === 0 ? `${num} posts` : `${num} post`);
 
     displayTopPosters = posts => 
+    // como entries brega: tienes un obj, a = {b:1, c:2} returns Obj.entries(a) // [['b': 2] ['c':2]]
+    // we will ahve an array of arrays
         Object.entries(posts)
+        // sort es un arr method. put everything in alphabetical order or value order 
+        // compare the count of the tpo posters and show them in descending order form greaters count 
             .sort((a, b) => b[1] - a[1])
+            // use them in the markup that will output in order to display all of our top posteres
+            // key=  user val: count of messages
             .map(([key, val], i) => (
                 <List.Item key={i}>
                     <Image avatar src={val.avatar}/>
