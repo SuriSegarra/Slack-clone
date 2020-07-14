@@ -9,8 +9,29 @@ export default class ColorPanel extends Component {
         primary: '',
         secondary: '',
         user: this.props.currentUser,
-        usersRef: firebase.database().ref('users')
+        usersRef: firebase.database().ref('users'),
+        userColors: []
     };
+    // set up listener to check to see if we have a value for our user prop in state
+    componentDidMount() {
+        if(this.state.user) {
+            this.addListener(this.state.user.uid)
+        }
+    }
+
+    addListener = userId => {
+        let userColors = [];
+        this.state.usersRef
+        // /colors to get all the colors props 
+        .child(`${userId}/colors`)
+        // in the snap callback we will collect all of the users colors 
+        .on("child_added", snap => {
+            // put them at the beggining of the arr using the unshift method 
+            userColors.unshift(snap.val());
+            this.setState({ userColors });
+
+        })
+    }
 
     handleChangePrimary = color => this.setState({ primary: color.hex });
 
@@ -42,13 +63,29 @@ export default class ColorPanel extends Component {
             .catch(err => console.error(err));
     };
 
+    displayUserColors = colors => (
+        // greater than 0 to see if we have colors 
+        // for each color we are going to display in a fragment 
+        colors.length > 0 && colors.map((color, i) => (
+            // we're going to pull of the index of the color we're iterating over and set it as the key of the fragment 
+            <React.Fragment key={i}>
+                <Divider />
+                <div className='color__container'>
+                    <div className='color__square' style={{background: color.primary}}>
+                        <div className='color__overlay' style={{background: color.secondary}}></div>
+                    </div>
+                </div>
+            </React.Fragment>
+        ))
+    )
+
 
     openModal = () => this.setState({ modal: true });
 
     closeModal = () => this.setState({ modal: false });
 
     render() {
-        const { modal, primary, secondary } = this.state;
+        const { modal, primary, secondary, userColors } = this.state;
 
         return (
             <Sidebar
@@ -61,7 +98,7 @@ export default class ColorPanel extends Component {
             >
                 <Divider/>
                 <Button icon='add' size='small' color='blue' onClick={this.openModal}/>
-
+                {this.displayUserColors(userColors)}
                 {/* Color Picker Modal */}
                 <Modal basic open={modal} onClose={this.closeModal}>
                     <Modal.Header>Choose App Colors</Modal.Header>
