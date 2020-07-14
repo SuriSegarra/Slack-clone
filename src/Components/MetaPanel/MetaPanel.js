@@ -19,6 +19,8 @@ export default class MetaPanel extends Component {
         this.setState({ activeIndex: newIndex });
     };
 
+    formatCount = num => (num > 1 || num === 0 ? `${num} posts` : `${num} post`);
+
     displayTopPosters = posts => 
         Object.entries(posts)
             .sort((a, b) => b[1] - a[1])
@@ -27,10 +29,13 @@ export default class MetaPanel extends Component {
                     <Image avatar src={val.avatar}/>
                     <List.Content>
                         <List.Header as='a'>{key}</List.Header>
-                        <List.Description>{val.count} posts</List.Description>
+                        <List.Description>{this.formatCount(val.count)}</List.Description>
                     </List.Content>
                 </List.Item>
-            ));
+            ))
+            // if we want to limit the number of top posters
+            // top 5
+            .slice(0, 5);
 
     render() {
         const { activeIndex, privateChannel, channel } = this.state;
