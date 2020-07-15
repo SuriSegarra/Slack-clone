@@ -10,7 +10,14 @@ class UserPanel extends React.Component {
         modal: false,
         previewImage: '',
         croppedImage: '',
-        blob: ''
+        blob: '',
+        uploadedCroppedImage: '',
+        storageRef: firebase.storage().ref(),
+        userRef: firebase.auth().currentUser,
+        usersRef: firebase.database().ref('users'),
+        metadata: {
+            contentType: 'image/jpeg'
+        }
     };
 
     openModal = () => this.setState({ modal: true });
@@ -35,6 +42,50 @@ class UserPanel extends React.Component {
             text: <span onClick={this.handleSignOut}>Sign Out</span>
         }
     ];
+
+    uploadCroppedImage = () => {
+        const { storageRef, userRef, blob, metadata } = this.state;
+
+        storageRef
+        // child that reference 
+        .child(`avatars/user-${userRef.uid}`)
+        // with metadata we are going to uploading all of our images as JPEG files 
+        .put(blob, metadata)
+        .then(snap => {
+            // we have uploaded an image to firebase sotrage as an image blob and then change the avatar
+            snap.ref.getDownloadURL().then(downloadURL => {
+                this.setState({ uploadedCroppedImage: downloadURL }, () => 
+                this.changeAvatar())
+            });
+        });
+
+    };
+
+    changeAvatar = () => {
+        this.state.userRef
+            .updateProfile({
+                // update it with the uploadedCroppedImage
+                photoURL: this.state.uploadedCroppedImage
+            })
+            .then(() => {
+                console.log('PhotoURL updated');
+                this.closeModal()
+            })
+            .catch(err => {
+                console.error(err);
+            })
+            // in addition to updating the user's profile with the userRef, we want to update their associated data in our usersRef in our firebase db
+            this.state.usersRef
+            // we set a child on the user to get the logged in user 
+            .child(this.state.user.uid)
+            .update({ avatar: this.state.uploadedCroppedImage })
+            .then(() => {
+                console.log('User avatar updated');
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }
 
     handleChange = e => {
         // refenrece the first file in the files arr 
@@ -146,7 +197,7 @@ class UserPanel extends React.Component {
                         </Modal.Content>
                         <Modal.Actions>
                             {/* only show this button if we have a cropped Image */}
-                            {croppedImage && <Button color='green' inverted>
+                            {croppedImage && <Button color='green' inverted onClick={this.uploadCroppedImage}>
                                 <Icon name='save' /> Change Avatar
                             </Button>}
                             <Button color='green' inverted onClick={this.handleCropImage}>
