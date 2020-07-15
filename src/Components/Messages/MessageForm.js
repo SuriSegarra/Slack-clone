@@ -9,6 +9,7 @@ import ProgressBar from './ProgressBar';
 export default class MessageForm extends Component {
     state = {
         storageRef: firebase.storage().ref(),
+        typingRef: firebase.database().ref('typing'),
         uploadTask: null,
         uploadState: '',
         percentUploaded: 0,
@@ -27,6 +28,25 @@ export default class MessageForm extends Component {
     handleChange = e => {
         //setting state according to the name of the input and give it the corresponding property
         this.setState({ [e.target.name]: e.target.value});
+    };
+
+    handleKeyDown = () => {
+        const { message, typingRef, channel, user } = this.state;
+        // if we have some value stored in our message prop
+        if(message) {
+            typingRef
+            // child set equal to channel di (that we are currently in)
+            .child(channel.id)
+            .child(user.uid)
+            //display name if they are currently typingt in the current channel
+            .set(user.displayName)
+        } else {
+            typingRef
+            .child(channel.id)
+            .child(user.uid)
+            // remove value we just set in typingref
+            .remove()
+        }
     };
 
     createMessage = (fileUrl = null) => {
@@ -76,7 +96,7 @@ export default class MessageForm extends Component {
             })
         }
     };
-// determines which path we should use based on whetehr the channel is private or public
+    // determines which path we should use based on whetehr the channel is private or public
     getPath = () => {
         if(this.props.isPrivateChannel) {
             return `chat/private-${this.state.channel.id}`;
@@ -153,6 +173,7 @@ export default class MessageForm extends Component {
                 fluid
                 name='message'
                 onChange={this.handleChange}
+                onKeyDown={this.handleKeyDown}
                 value={message}
                 style={{ marginBottom: '0.7em' }}
                 label={<Button icon={'add'} />}
