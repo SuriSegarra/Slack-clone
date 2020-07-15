@@ -1,11 +1,16 @@
 import React from 'react';
 import firebase from '../../firebase';
+import AvatarEditor from 'react-avatar-editor';
+
 import { Grid, GridColumn, GridRow, Header, HeaderContent, Icon, Dropdown, Image, Modal, Input, Button } from 'semantic-ui-react';
 
 class UserPanel extends React.Component {
     state = {
         user: this.props.currentUser,
-        modal: false
+        modal: false,
+        previewImage: '',
+        croppedImage: '',
+        blob: ''
     };
 
     openModal = () => this.setState({ modal: true });
@@ -31,16 +36,47 @@ class UserPanel extends React.Component {
         }
     ];
 
+    handleChange = e => {
+        // refenrece the first file in the files arr 
+        const file = e.target.files[0];
+        // file reader API.  reads the contents of files (or raw data buffers) stored on the user's computer
+        const reader = new FileReader();
+
+        if(file) {
+            // reads the file within 
+            reader.readAsDataURL(file);
+            reader.addEventListener('load', () => {
+                this.setState({ previewImage: reader.result })
+            } )
+        }
+    };
+
+    // to crop prev image
+    handleCropImage = () => {
+        // check that we have this reference
+        if(this.AvatarEditor) {
+            // this will do the cropping in our image
+            this.AvatarEditor.getImageScaledToCanvas().toBlob(blob => {
+                let imageUrl = URL.createObjectURL(blob);
+                this.setState({ 
+                    croppedImage: imageUrl,
+                    // sends the images file over to firebase storage
+                    blob 
+                });
+            });
+        }
+    }
+
     handleSignOut = () => {
-firebase
-.auth()
-.signOut()
-.then(() => console.log('signed out'));
+        firebase
+        .auth()
+        .signOut()
+        .then(() => console.log('signed out'));
 
     } 
     render() {
 
-        const { user, modal } = this.state;
+        const { user, modal, previewImage, croppedImage } = this.state;
         const { primaryColor } = this.props
       
         return (
@@ -71,6 +107,7 @@ firebase
                         <Modal.Header> Change Avatar </Modal.Header>
                         <Modal.Content>
                             <Input  
+                                onChange={this.handleChange}
                                 fluid
                                 type='file'
                                 label='New Avatar'
@@ -80,19 +117,39 @@ firebase
                                 <GridRow centered>
                                     {/* smenatic ui class */}
                                     <GridColumn className='ui center aligned grid'>
-                                        {/* image preview */}
+                                        {/* if we have a prev image we're going to show the avatar editor component where it accepts an image  */}
+                                        {previewImage && (
+                                            <AvatarEditor 
+                                                ref={node => (this.AvatarEditor = node)}
+                                                image={previewImage}
+                                                // px
+                                                width={120}
+                                                height={120}
+                                                border={50}
+                                                scale={1.2}
+                                            />
+                                        )}
                                     </GridColumn>
                                     <GridColumn>
-                                        {/* cropped image preview  */}
+                                        {/* first check if we have a value for a cropped Image in state, if so, renders  image component   */}
+                                        {croppedImage && (
+                                            <Image
+                                                style={{ margin: '3.5em auto' }}
+                                                width={100}
+                                                height={100}
+                                                src={croppedImage}
+                                            />
+                                        )}
                                     </GridColumn>
                                 </GridRow>
                             </Grid>
                         </Modal.Content>
                         <Modal.Actions>
-                            <Button color='green' inverted>
+                            {/* only show this button if we have a cropped Image */}
+                            {croppedImage && <Button color='green' inverted>
                                 <Icon name='save' /> Change Avatar
-                            </Button>
-                            <Button color='green' inverted>
+                            </Button>}
+                            <Button color='green' inverted onClick={this.handleCropImage}>
                                 <Icon name='image' /> Preview
                             </Button>
                             <Button color='red' inverted onClick={this.closeModal}>
