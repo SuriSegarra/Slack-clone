@@ -37,9 +37,10 @@ firebase
     render() {
 
         const { user } = this.state;
+        const { primaryColor } = this.props
       
         return (
-            <Grid style={{ background: '4c3c4c' }}> 
+            <Grid style={{ background: primaryColor }}> 
                 <GridColumn>
                     <GridRow style={{ padding: '1.2rem', margin: 0 }}>
                         {/*  app header */}
