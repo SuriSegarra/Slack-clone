@@ -7,6 +7,7 @@ import { setUserPosts } from '../../actions';
 import MessagesHeader from './MessagesHeader';
 import MessageForm from './MessageForm';
 import Message from './Message';
+import Typing from './Typing';
 
 class Messages extends Component {
     state = {
@@ -207,7 +208,12 @@ class Messages extends Component {
 
                 <Segment>
                     <Comment.Group className='messages'>
-                    {searchTerm ? this.displayMessages(searchResults) : this.displayMessages(messages)}
+                    {searchTerm 
+                    ? this.displayMessages(searchResults) 
+                    : this.displayMessages(messages)}
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <span className='user__typing'> Arelis is typing</span><Typing/>
+                    </div>
                     </Comment.Group>
                 </Segment>
 

@@ -70,7 +70,7 @@ export default class MessageForm extends Component {
         //restructuring from props in order to create a message in our db 
         const { getMessagesRef } = this.props;
         //holds content of our messages
-        const { message, channel, typingRef } = this.state
+        const { message, channel, typingRef, user } = this.state
 
         if(message) {
             this.setState({ loading: true })
