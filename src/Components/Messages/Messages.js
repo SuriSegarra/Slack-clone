@@ -23,7 +23,10 @@ class Messages extends Component {
         numUniqueUsers: '',
         searchTerm: '',
         searchLoading: false,
-        searchResults: []
+        searchResults: [],
+        typingRef: firebase.database().ref('typing'),
+        typingUsers: [],
+        connectedRef: firebase.database().ref('.info/connected')
     };
     // TO check if we have a value in our gs for currentChannel and currentUser 
     componentDidMount() {
@@ -37,8 +40,55 @@ class Messages extends Component {
 
     addListeners = channelId => {
         this.addMessageListener(channelId);
-    }
-// we're going to listen for any new messages added for a given channel 
+        this.addTypingListeners(channelId);
+    };
+
+    addTypingListeners = (channelId) => {
+        // collects all the users typing within a given channel based on its id
+        let typingUsers = [];
+
+        this.state.typingRef.child(channelId).on("child_added", snap => {
+            // makes sure that the snap.key is not the same as user uid. to make sure that we are not collecting the current auth user whithin this typing users arr
+            if (snap.key !== this.state.user.uid) {
+                typingUsers = typingUsers.concat({
+                    // we are collecting the users id and their name and we are redesigning the typing users arr 
+                    id: snap.key, 
+                    name: snap.val()
+                })
+
+                this.setState({ typingUsers });
+            }
+        })
+
+        this.state.typingRef.child(channelId).on("child_removed", snap => {
+            // iterate over every user element, we want to compare the user id prop with snap key 
+            const index = typingUsers.findIndex(user => user.id === snap.key)
+            // if theres no index value that is positive
+            if (index !== -1) {
+                // if an index cant be found we use filter method wi;; iterate once again over the typingUsers arr to make sure that none of the ids whithin this elements is equal to snap.key
+                typingUsers = typingUsers.filter(user => user.id !== snap.key)
+                // and reassing typing user arr once again and set state 
+                this.setState({ typingUsers })
+            }
+        })
+        // listens to a value change
+        this.state.connectedRef.on('value', snap => {
+            if (snap.val() === true) {
+                this.state.typingRef
+                .child(channelId)
+                .child(this.state.user.uid)
+                .onDisconnect()
+                // when an authenticated user logs put their child value on the typingRef will be removed
+                .remove(err => {
+                    if (err !== null) {
+                        console.error(err);
+                    }
+                })
+            }
+        })
+    };
+
+    // we're going to listen for any new messages added for a given channel 
     addMessageListener = channelId => {
         let loadedMessages = [];
         const ref = this.getMessagesRef();
@@ -52,7 +102,7 @@ class Messages extends Component {
             this.countUserPost(loadedMessages);
         });
     };
-// takes both values in order to get all of the channels and related information about the channels that the user has start
+    // takes both values in order to get all of the channels and related information about the channels that the user has start
     addUserStarsListener = (channelId, userId) => {
         this.state.usersRef 
         // select child based on the user's id 
@@ -74,7 +124,7 @@ class Messages extends Component {
             }
         });
     };
-// where all the private messages from private messages will be stored
+    // where all the private messages from private messages will be stored
     getMessagesRef = () => {
         const { messagesRef, privateMessagesRef, privateChannel } = this.state;
         // if its a private channel, we're going to use private messages , otherwise messagesRef (public)
@@ -189,10 +239,17 @@ class Messages extends Component {
         // if its not channel, return empty string
         '';
     };
-    
+
+    displayTypingUsers = users => 
+        users.length > 0 && users.map(user => (
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.2em' 
+            }} key={user.id}>
+                <span className='user__typing'> {user.name} is typing</span><Typing/>
+            </div>
+        ))
 
     render() {
-        const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults, searchLoading, privateChannel, isChannelStarred } = this.state;
+        const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults, searchLoading, privateChannel, isChannelStarred, typingUsers } = this.state;
 
         return (
             <React.Fragment>
@@ -211,9 +268,7 @@ class Messages extends Component {
                     {searchTerm 
                     ? this.displayMessages(searchResults) 
                     : this.displayMessages(messages)}
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <span className='user__typing'> Arelis is typing</span><Typing/>
-                    </div>
+                    {this.displayTypingUsers(typingUsers)}
                     </Comment.Group>
                 </Segment>
 
