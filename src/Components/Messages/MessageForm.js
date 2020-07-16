@@ -70,7 +70,7 @@ export default class MessageForm extends Component {
         //restructuring from props in order to create a message in our db 
         const { getMessagesRef } = this.props;
         //holds content of our messages
-        const { message, channel } = this.state
+        const { message, channel, typingRef } = this.state
 
         if(message) {
             this.setState({ loading: true })
@@ -80,7 +80,12 @@ export default class MessageForm extends Component {
             .push()
             .set(this.createMessage())
             .then(() => {
-                this.setState({ loading: false, message: '', errors: [] })
+                this.setState({ loading: false, message: '', errors: [] });
+                // once we sent off a message, we want to remove the typing Ref that references the cirrent use
+                typingRef
+                    .child(channel.id)
+                    .child(user.uid)
+                    .remove()
             })
                 .catch(err => {
                     console.log(err)
