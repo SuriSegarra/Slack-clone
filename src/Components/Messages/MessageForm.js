@@ -33,7 +33,11 @@ export default class MessageForm extends Component {
         this.setState({ [e.target.name]: e.target.value});
     };
 
-    handleKeyDown = () => {
+    handleKeyDown = event => {
+        if (event.keyCode === 13) {
+            this.sendMessage();
+        }
+
         const { message, typingRef, channel, user } = this.state;
         // if we have some value stored in our message prop
         if(message) {
