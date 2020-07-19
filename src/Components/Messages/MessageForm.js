@@ -147,7 +147,7 @@ export default class MessageForm extends Component {
     // determines which path we should use based on whetehr the channel is private or public
     getPath = () => {
         if(this.props.isPrivateChannel) {
-            return `chat/private-${this.state.channel.id}`;
+            return `chat/private/${this.state.channel.id}`;
         } else {
             return 'chat/public';
         }

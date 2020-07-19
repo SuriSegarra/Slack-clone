@@ -48,7 +48,7 @@ class UserPanel extends React.Component {
 
         storageRef
         // child that reference 
-        .child(`avatars/user-${userRef.uid}`)
+        .child(`avatars/users/${userRef.uid}`)
         // with metadata we are going to uploading all of our images as JPEG files 
         .put(blob, metadata)
         .then(snap => {
