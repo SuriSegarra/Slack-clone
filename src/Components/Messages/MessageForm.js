@@ -23,6 +23,14 @@ export default class MessageForm extends Component {
         modal: false,
         emojiPicker: false
     };
+    // we hace this uploadTask prop in state which holds onto the currently uploading image
+    // here we dont want to remove a listener, we cant to cancel any uploads 
+    componentWillUnmount() {
+        if(this.state.uploadTask !== null) {
+            this.state.uploadTask.cancel();
+            this.setState({ uploadTask: null });
+        }
+    }
 
     openModal = () => this.setState({ modal: true });
     closeModal = () => this.setState({ modal: false });
@@ -34,6 +42,7 @@ export default class MessageForm extends Component {
     };
 
     handleKeyDown = event => {
+        // when pressing enter, sends messages 
         if (event.keyCode === 13) {
             this.sendMessage();
         }

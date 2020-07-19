@@ -20,6 +20,15 @@ class Starred extends Component {
             this.addListeners(this.state.user.uid);
         }
     }
+
+    componentWillUnmount() {
+        this.removeListeners();
+    }
+
+    removeListeners = () => {
+        this.state.usersRef.child(`${this.state.user.uid}/starred`).off();
+    };
+    
 // esto es para el starred area. el add y rmeove the starred channels
     addListeners = userId => {
         // will listen for the users ref for any new changes to the starred prop

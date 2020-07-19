@@ -27,21 +27,45 @@ class Messages extends Component {
         searchResults: [],
         typingRef: firebase.database().ref('typing'),
         typingUsers: [],
-        connectedRef: firebase.database().ref('.info/connected')
+        connectedRef: firebase.database().ref('.info/connected'),
+        listeners: []
     };
     // TO check if we have a value in our gs for currentChannel and currentUser 
     componentDidMount() {
-        const { channel, user } = this.state;
+        const { channel, user, listeners } = this.state;
 
         if(channel && user) {
+            this.removeListeners(listeners);
             this.addListeners(channel.id);
             this.addUserStarsListener(channel.id, user.uid)
         }
+    };
+    // removing listeners 
+    componentWillUnmount() {
+        this.removeListeners(this.state.listeners);
+        this.state.connectedRef.off();
+    };
+
+    removeListeners = listeners => {
+        listeners.forEach(listener => {
+            listener.ref.child(listener.id).off(listener.event);
+        });
     }
 
     componentDidUpdate(prevProps, prevState) {
         if(this.messagesEnd) {
             this.scrollTpBottom();
+        }
+    }
+
+    addToListeners = (id, ref, event) => {
+        const index = this.state.listeners.findIndex(listener => {
+            return listener.id === id && listener.ref === ref  && listener.event === event;
+        })
+
+        if (index === -1) {
+            const newListeners = { id, ref, event };
+            this.setState({ listeners: this.state.listeners.concat(newListeners) });
         }
     }
 
@@ -69,7 +93,8 @@ class Messages extends Component {
 
                 this.setState({ typingUsers });
             }
-        })
+        });
+        this.addToListeners(channelId, this.state.typingRef, 'child_added');
 
         this.state.typingRef.child(channelId).on("child_removed", snap => {
             // iterate over every user element, we want to compare the user id prop with snap key 
@@ -81,7 +106,8 @@ class Messages extends Component {
                 // and reassing typing user arr once again and set state 
                 this.setState({ typingUsers })
             }
-        })
+        });
+        this.addToListeners(channelId, this.state.typingRef, 'child_removed');
         // listens to a value change
         this.state.connectedRef.on('value', snap => {
             if (snap.val() === true) {
@@ -112,6 +138,7 @@ class Messages extends Component {
             this.countUniqueUsers(loadedMessages);
             this.countUserPost(loadedMessages);
         });
+        this.addToListeners(channelId, ref, 'child_added');
     };
     // takes both values in order to get all of the channels and related information about the channels that the user has start
     addUserStarsListener = (channelId, userId) => {
