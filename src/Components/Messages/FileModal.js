@@ -9,10 +9,8 @@ export default class FileModal extends Component {
     };
 
     addFile = e => {
-        //will select the first element with the index of 0 
         const file  = e.target.files[0];
         if(file) {
-            //if theres is a value for this file variable, we're going to set the state 
             this.setState({ file });
         }
     };
@@ -22,7 +20,6 @@ export default class FileModal extends Component {
         const { uploadFile, closeModal } = this.props
         if(file !== null) {
             if(this.isAuthorized(file.name)) {
-                //send file 
                 const metadata = { contentType: mime.lookup(file.name) };
                 uploadFile(file, metadata);
                 closeModal();

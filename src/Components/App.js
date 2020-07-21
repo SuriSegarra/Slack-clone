@@ -17,7 +17,6 @@ const App = ({ currentUser, currentChannel, isPrivateChannel, userPosts, primary
 
     />
     <SidePanel
-      //uid unique identifier
       key={currentUser && currentUser.uid}
       currentUser={currentUser} 
       primaryColor={primaryColor}
@@ -46,9 +45,7 @@ const App = ({ currentUser, currentChannel, isPrivateChannel, userPosts, primary
 const mapStateToProps = state => ({
   currentUser: state.user.currentUser,
   currentChannel: state.channel.currentChannel,
-  // we need to know whether a given channel that we're in is in private and a number of places within our messages 
   isPrivateChannel: state.channel.isPrivateChannel,
-  // to get current value of user posts from state that channel that user post 
   userPosts: state.channel.userPosts,
   primaryColor: state.colors.primaryColor,
   secondaryColor: state.colors.secondaryColor

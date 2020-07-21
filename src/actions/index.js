@@ -1,5 +1,5 @@
 import * as actionTypes from './types';
-// USER ACTION 
+
 export const setUser = user => {
     return {
         type: actionTypes.SET_USER, 
@@ -15,7 +15,6 @@ export const clearUser = () => {
     }
 }
 
-// Channel actions 
 export const setCurrentChannel = channel => {
     return {
         type: actionTypes.SET_CURRENT_CHANNEL,
@@ -42,8 +41,6 @@ export const setUserPosts = userPosts => {
         }
     }
 }
-
-// colors actions 
 
 export const setColors = (primaryColor, secondaryColor) => {
     return {

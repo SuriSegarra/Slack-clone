@@ -23,8 +23,7 @@ export default class MessageForm extends Component {
         modal: false,
         emojiPicker: false
     };
-    // we hace this uploadTask prop in state which holds onto the currently uploading image
-    // here we dont want to remove a listener, we cant to cancel any uploads 
+
     componentWillUnmount() {
         if(this.state.uploadTask !== null) {
             this.state.uploadTask.cancel();
@@ -37,30 +36,25 @@ export default class MessageForm extends Component {
 
 
     handleChange = e => {
-        //setting state according to the name of the input and give it the corresponding property
         this.setState({ [e.target.name]: e.target.value});
     };
 
     handleKeyDown = event => {
-        // when pressing enter, sends messages 
         if (event.keyCode === 13) {
             this.sendMessage();
         }
 
         const { message, typingRef, channel, user } = this.state;
-        // if we have some value stored in our message prop
+        
         if(message) {
             typingRef
-            // child set equal to channel di (that we are currently in)
             .child(channel.id)
             .child(user.uid)
-            //display name if they are currently typingt in the current channel
             .set(user.displayName)
         } else {
             typingRef
             .child(channel.id)
             .child(user.uid)
-            // remove value we just set in typingref
             .remove()
         }
     };
@@ -77,7 +71,6 @@ export default class MessageForm extends Component {
     };
 
     colonToUnicode = message => {
-        // takes our messahe and converts that emoji colon value to a unicode using emojiIndex that we imported
         return message.replace(/:[A-Aa-z0-9_+-]+:/g, x => {
             x = x.replace(/:/g, '');
             let emoji = emojiIndex.emojis[x];
@@ -110,21 +103,17 @@ export default class MessageForm extends Component {
     }
 
     sendMessage = () => {
-        //restructuring from props in order to create a message in our db 
         const { getMessagesRef } = this.props;
-        //holds content of our messages
         const { message, channel, typingRef, user } = this.state
 
         if(message) {
             this.setState({ loading: true })
             getMessagesRef()
-            // to specify which channels we are adding this messgae to 
             .child(channel.id)
             .push()
             .set(this.createMessage())
             .then(() => {
                 this.setState({ loading: false, message: '', errors: [] });
-                // once we sent off a message, we want to remove the typing Ref that references the cirrent use
                 typingRef
                     .child(channel.id)
                     .child(user.uid)
@@ -137,14 +126,13 @@ export default class MessageForm extends Component {
                         errors: this.state.errors.concat(err)
                     })
                 })
-        // if we dont have a message...
         } else {
             this.setState({
                 errros: this.state.errors.concat({ message: 'Add a message' })
             })
         }
     };
-    // determines which path we should use based on whetehr the channel is private or public
+
     getPath = () => {
         if(this.props.isPrivateChannel) {
             return `chat/private/${this.state.channel.id}`;
@@ -163,7 +151,6 @@ export default class MessageForm extends Component {
            uploadState: 'uploading',
            uploadTask: this.state.storageRef.child(filePath).put(file, metadata)
        },
-       //listen to the percent of the file that was uploaded and set the state with that percentage 
         () => {
             this.state.uploadTask.on('state_changed', snap => {
                 const percentUploaded = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
@@ -212,7 +199,6 @@ export default class MessageForm extends Component {
 
 
     render() {
-        //prettier-ignore
         const { errors, message, loading, modal, uploadState, percentUploaded, emojiPicker } = this.state;
 
         return (

@@ -47,12 +47,9 @@ class UserPanel extends React.Component {
         const { storageRef, userRef, blob, metadata } = this.state;
 
         storageRef
-        // child that reference 
         .child(`avatars/users/${userRef.uid}`)
-        // with metadata we are going to uploading all of our images as JPEG files 
         .put(blob, metadata)
         .then(snap => {
-            // we have uploaded an image to firebase sotrage as an image blob and then change the avatar
             snap.ref.getDownloadURL().then(downloadURL => {
                 this.setState({ uploadedCroppedImage: downloadURL }, () => 
                 this.changeAvatar())
@@ -64,7 +61,6 @@ class UserPanel extends React.Component {
     changeAvatar = () => {
         this.state.userRef
             .updateProfile({
-                // update it with the uploadedCroppedImage
                 photoURL: this.state.uploadedCroppedImage
             })
             .then(() => {
@@ -74,9 +70,7 @@ class UserPanel extends React.Component {
             .catch(err => {
                 console.error(err);
             })
-            // in addition to updating the user's profile with the userRef, we want to update their associated data in our usersRef in our firebase db
             this.state.usersRef
-            // we set a child on the user to get the logged in user 
             .child(this.state.user.uid)
             .update({ avatar: this.state.uploadedCroppedImage })
             .then(() => {
@@ -88,13 +82,10 @@ class UserPanel extends React.Component {
     }
 
     handleChange = e => {
-        // refenrece the first file in the files arr 
         const file = e.target.files[0];
-        // file reader API.  reads the contents of files (or raw data buffers) stored on the user's computer
         const reader = new FileReader();
 
         if(file) {
-            // reads the file within 
             reader.readAsDataURL(file);
             reader.addEventListener('load', () => {
                 this.setState({ previewImage: reader.result })
@@ -102,16 +93,12 @@ class UserPanel extends React.Component {
         }
     };
 
-    // to crop prev image
     handleCropImage = () => {
-        // check that we have this reference
         if(this.AvatarEditor) {
-            // this will do the cropping in our image
             this.AvatarEditor.getImageScaledToCanvas().toBlob(blob => {
                 let imageUrl = URL.createObjectURL(blob);
                 this.setState({ 
                     croppedImage: imageUrl,
-                    // sends the images file over to firebase storage
                     blob 
                 });
             });
@@ -134,13 +121,11 @@ class UserPanel extends React.Component {
             <Grid style={{ background: primaryColor }}> 
                 <GridColumn>
                     <GridRow style={{ padding: '1.2rem', margin: 0 }}>
-                        {/*  app header */}
                         <Header inverted floated='left' as='h2'>
                             <Icon name='code'/>
                             <HeaderContent>DevChat</HeaderContent>
                         </Header>
-                        
-                        {/* user dropdown */}
+
                         <Header style={{ padding: '0.25rem' }} as='h4' inverted>
                             <Dropdown 
                                 trigger={
@@ -153,7 +138,6 @@ class UserPanel extends React.Component {
                         </Header>
                     </GridRow>
 
-                    {/* Change User Avatar Modal */}
                     <Modal basic open={modal} onClose={this.closeModal}>
                         <Modal.Header> Change Avatar </Modal.Header>
                         <Modal.Content>
@@ -166,14 +150,11 @@ class UserPanel extends React.Component {
                             />
                             <Grid centered stackable columns={2}>
                                 <GridRow centered>
-                                    {/* smenatic ui class */}
                                     <GridColumn className='ui center aligned grid'>
-                                        {/* if we have a prev image we're going to show the avatar editor component where it accepts an image  */}
                                         {previewImage && (
                                             <AvatarEditor 
                                                 ref={node => (this.AvatarEditor = node)}
                                                 image={previewImage}
-                                                // px
                                                 width={120}
                                                 height={120}
                                                 border={50}
@@ -182,7 +163,6 @@ class UserPanel extends React.Component {
                                         )}
                                     </GridColumn>
                                     <GridColumn>
-                                        {/* first check if we have a value for a cropped Image in state, if so, renders  image component   */}
                                         {croppedImage && (
                                             <Image
                                                 style={{ margin: '3.5em auto' }}
@@ -196,7 +176,6 @@ class UserPanel extends React.Component {
                             </Grid>
                         </Modal.Content>
                         <Modal.Actions>
-                            {/* only show this button if we have a cropped Image */}
                             {croppedImage && <Button color='green' inverted onClick={this.uploadCroppedImage}>
                                 <Icon name='save' /> Change Avatar
                             </Button>}

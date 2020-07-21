@@ -15,7 +15,7 @@ class ColorPanel extends Component {
         usersRef: firebase.database().ref('users'),
         userColors: []
     };
-    // set up listener to check to see if we have a value for our user prop in state
+
     componentDidMount() {
         if(this.state.user) {
             this.addListener(this.state.user.uid)
@@ -26,7 +26,6 @@ class ColorPanel extends Component {
         this.removeListener();
     };
 
-    // removes listener we have set up 
     removeListener = () => {
         this.state.usersRef.child(`${this.state.user.uid}/colors`).off();
     };
@@ -34,14 +33,10 @@ class ColorPanel extends Component {
     addListener = userId => {
         let userColors = [];
         this.state.usersRef
-        // /colors to get all the colors props 
         .child(`${userId}/colors`)
-        // in the snap callback we will collect all of the users colors 
         .on("child_added", snap => {
-            // put them at the beggining of the arr using the unshift method 
             userColors.unshift(snap.val());
             this.setState({ userColors });
-
         })
     }
 
@@ -49,22 +44,16 @@ class ColorPanel extends Component {
 
     handleChangeSecondary = color => this.setState({ secondary: color.hex });
 
-    // validation to make sure that we have values for both primary color and secondary color in state
     handleSaveColors = () => {
         if(this.state.primary && this.state.secondary) {
-            // if we have values for both, execute fucntion saveColors and pass the values of Primary and Secondary
             this.saveColors(this.state.primary, this.state.secondary);
         }
     };
 
-    // we reach of to firebase using usersRef
     saveColors = (primary, secondary) => {
         this.state.usersRef
-            // add child with currentUser id 
             .child(`${this.state.user.uid}/colors`)
-            // push uid onto this new prop
             .push()
-            // push obj with both the primary and secondary colors that we are getting from the params of save colors 
             .update({
                 primary, secondary
             })
@@ -76,10 +65,7 @@ class ColorPanel extends Component {
     };
 
     displayUserColors = colors => (
-        // greater than 0 to see if we have colors 
-        // for each color we are going to display in a fragment 
         colors.length > 0 && colors.map((color, i) => (
-            // we're going to pull of the index of the color we're iterating over and set it as the key of the fragment 
             <React.Fragment key={i}>
                 <Divider />
                 <div 
@@ -114,11 +100,9 @@ class ColorPanel extends Component {
                 <Divider/>
                 <Button icon='add' size='small' color='blue' onClick={this.openModal}/>
                 {this.displayUserColors(userColors)}
-                {/* Color Picker Modal */}
                 <Modal basic open={modal} onClose={this.closeModal}>
                     <Modal.Header>Choose App Colors</Modal.Header>
                     <Modal.Content>
-                        {/* inverted so you can see the text on label */}
                         <Segment inverted >
                             <Label content='Primary Color'/>
                             <SliderPicker color={primary} onChange={this.handleChangePrimary}/>

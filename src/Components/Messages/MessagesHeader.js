@@ -6,13 +6,10 @@ export default class MessagesHeader extends Component {
         const { channelName, numUniqueUsers, handleSearchChange, searchLoading, isPrivateChannel, handleStar, isChannelStarred } = this.props;
 
         return (
-            //clearing: clear floated content.
             <Segment clearing>
-                {/* channel title */}
                 <Header fluid='true' as='h2' floated='left' style={{ marginBottom: 0 }}>
                     <span>
                     {channelName}
-                    {/* if its not a private channel, if it is a pubic channel only then will show the start icon  */}
                     {!isPrivateChannel && ( 
                     <Icon 
                          onClick={handleStar} 
@@ -24,7 +21,6 @@ export default class MessagesHeader extends Component {
                     <Header.Subheader>{numUniqueUsers}</Header.Subheader>
                 </Header>
 
-                {/* channel search input */}
                 <Header floated='right'>
                     <Input
                         loading={searchLoading}

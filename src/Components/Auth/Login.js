@@ -10,8 +10,6 @@ import { Grid,
     GridColumn } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 
-
-//stateful component
 class Login extends React.Component {
 
     state= {
@@ -29,7 +27,6 @@ class Login extends React.Component {
     }
 
     handleSubmit = (e) => {
-        //makes sure that all of the fiels are filled out
         e.preventDefault();
         if(this.isFormValid(this.state)) {
             this.setState({ errros: [], loading: true });

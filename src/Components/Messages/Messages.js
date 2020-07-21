@@ -30,7 +30,7 @@ class Messages extends Component {
         connectedRef: firebase.database().ref('.info/connected'),
         listeners: []
     };
-    // TO check if we have a value in our gs for currentChannel and currentUser 
+
     componentDidMount() {
         const { channel, user, listeners } = this.state;
 
@@ -40,7 +40,7 @@ class Messages extends Component {
             this.addUserStarsListener(channel.id, user.uid)
         }
     };
-    // removing listeners 
+
     componentWillUnmount() {
         this.removeListeners(this.state.listeners);
         this.state.connectedRef.off();
@@ -79,14 +79,11 @@ class Messages extends Component {
     };
 
     addTypingListeners = (channelId) => {
-        // collects all the users typing within a given channel based on its id
         let typingUsers = [];
 
         this.state.typingRef.child(channelId).on("child_added", snap => {
-            // makes sure that the snap.key is not the same as user uid. to make sure that we are not collecting the current auth user whithin this typing users arr
             if (snap.key !== this.state.user.uid) {
                 typingUsers = typingUsers.concat({
-                    // we are collecting the users id and their name and we are redesigning the typing users arr 
                     id: snap.key, 
                     name: snap.val()
                 })
@@ -97,25 +94,20 @@ class Messages extends Component {
         this.addToListeners(channelId, this.state.typingRef, 'child_added');
 
         this.state.typingRef.child(channelId).on("child_removed", snap => {
-            // iterate over every user element, we want to compare the user id prop with snap key 
             const index = typingUsers.findIndex(user => user.id === snap.key)
-            // if theres no index value that is positive
+
             if (index !== -1) {
-                // if an index cant be found we use filter method wi;; iterate once again over the typingUsers arr to make sure that none of the ids whithin this elements is equal to snap.key
                 typingUsers = typingUsers.filter(user => user.id !== snap.key)
-                // and reassing typing user arr once again and set state 
                 this.setState({ typingUsers })
             }
         });
         this.addToListeners(channelId, this.state.typingRef, 'child_removed');
-        // listens to a value change
         this.state.connectedRef.on('value', snap => {
             if (snap.val() === true) {
                 this.state.typingRef
                 .child(channelId)
                 .child(this.state.user.uid)
                 .onDisconnect()
-                // when an authenticated user logs put their child value on the typingRef will be removed
                 .remove(err => {
                     if (err !== null) {
                         console.error(err);
@@ -125,7 +117,6 @@ class Messages extends Component {
         })
     };
 
-    // we're going to listen for any new messages added for a given channel 
     addMessageListener = channelId => {
         let loadedMessages = [];
         const ref = this.getMessagesRef();
@@ -140,32 +131,25 @@ class Messages extends Component {
         });
         this.addToListeners(channelId, ref, 'child_added');
     };
-    // takes both values in order to get all of the channels and related information about the channels that the user has start
+
     addUserStarsListener = (channelId, userId) => {
         this.state.usersRef 
-        // select child based on the user's id 
         .child(userId)
-        // to get the entire start prop
         .child('starred')
-        // to get its value 
         .once('value')
-        // get data...
         .then(data => {
-            // make sure we have a value for the starred prop
+
             if(data.val() !== null) {
-                // get all the channels ID that a given user has saved and get an arr of them 
                 const channelIds = Object.keys(data.val());
-                // take arr of id and with includes method, see if our given channels ID is present within it 
                 const prevStarred = channelIds.includes(channelId);
-                // if it finds that within the arr it includes finds it rturn value of true and update channelStarred based on the previousStarred var
+
                 this.setState({ isChannelStarred: prevStarred });
             }
         });
     };
-    // where all the private messages from private messages will be stored
+
     getMessagesRef = () => {
         const { messagesRef, privateMessagesRef, privateChannel } = this.state;
-        // if its a private channel, we're going to use private messages , otherwise messagesRef (public)
         return privateChannel ? privateMessagesRef : messagesRef;
     };
 
@@ -185,12 +169,9 @@ class Messages extends Component {
     starChannel = () => {
         if(this.state.isChannelStarred) {
             this.state.usersRef
-            // select given child of that ref
             .child(`${this.state.user.uid}/starred`)
-            // obj dynamically change the idea of the channel and it's related data
             .update({
                 [this.state.channel.id]: {
-                    // obj props
                     name: this.state.channel.name,
                     details: this.state.channel.details,
                     createdBy: {
@@ -200,7 +181,6 @@ class Messages extends Component {
                 }
             });
         } else {
-            // for every channel that we store we're adding a new channel ID with all the information about it 
             this.state.usersRef
             .child(`${this.state.user.uid}/starred`)
             .child(this.state.channel.id)
@@ -213,9 +193,8 @@ class Messages extends Component {
     };
 
     handleSearchMessages = () => {
-        //we spread all the values messages and assign it to channelMessages to not mutate the original messages array 
+
         const channelMessages = [...this.state.messages];
-        //g = global, match all instances of the pattern in a string, not just one i = case-insensitive
         const regex = new RegExp(this.state.searchTerm, 'gi');
         const searchResults = channelMessages.reduce((acc, message) => {
             if (
@@ -233,7 +212,6 @@ class Messages extends Component {
     countUniqueUsers = messages => {
         const uniqueUsers = messages.reduce((acc, message) => {
             if (!acc.includes(message.user.name)) {
-                //if it doesnt includea certain users name then well add it to our acc 
                 acc.push(message.user.name);
             }
             return acc;
@@ -255,26 +233,20 @@ class Messages extends Component {
 
     countUserPost = messages => {
         let userPosts = messages.reduce((acc, message) => {
-            // check to the body of produce wether there is a prop on the acc obj with the name of the current message user name if so were going to take the obj and increment its count by 1 
             if(message.user.name in acc) {
                 acc[message.user.name].count += 1;
-                // otherwise we are going to add a new obj on to the acc obj 
             } else {
                 acc[message.user.name] = {
                     avatar: message.user.avatar,
-                    // since this is the forst time finding a message with the given username
                     count: 1
                 }
             } return acc;
         }, {});
-        // this action executes setUserPosts. this is to put it in GS
         this.props.setUserPosts(userPosts);
     };
 
     displayChannelName = channel => {
-        //if we pass a channle and then if so, check if is private, if so @, otherwise # for public channle 
         return channel ? `${this.state.privateChannel ? '@' : '#'}${channel.name}` :
-        // if its not channel, return empty string
         '';
     };
 

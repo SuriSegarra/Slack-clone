@@ -1,7 +1,6 @@
 html, 
 body,
 .app {
-    /* it takes entire heght of the browser */
     height: 100vh;
     background: #eee;
     padding: 1em;
@@ -18,7 +17,6 @@ body,
   }
 
 /* MessageForm */
-
 .message__form {
     position: fixed !important;
     bottom: 1em;
@@ -68,7 +66,6 @@ body,
 }  
 
 /* Typings.js */
-/* text next to animation */
 .user__typing {
     font-style: italic;
     font-weight: bold;
@@ -107,9 +104,8 @@ body,
 .typing__dot:nth-child(3) {
     animation-delay: 0.4s;
 }
-/* the animation for each dot will be slightly offset to create our animation  */
+
 @keyframes loadingFade {
-    /* at 0% the opacity of the animation will be 0  */
     0% {
         opacity: 0;     
     }

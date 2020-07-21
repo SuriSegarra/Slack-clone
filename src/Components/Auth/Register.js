@@ -28,21 +28,17 @@ class Register extends React.Component {
         let errors = [];
         let error;
 
-        //make sure all our inputs are filled out 
         if(this.isFormEmpty(this.state)){
-            //throw error
             error = { message: 'Fill in all fields' };
             this.setState({ errors: errors.concat(error) });
-            return false; //do not execute handle submit 
+            return false; 
 
         } else if(!this.isPasswordValid(this.state)) {
-            //throw error
             error = { message: 'Password is invalid' }
             this.setState({ errors: errors.concat(error)})
             return false;
 
-        } else {
-            //form valid. allow data to be sent to firebase 
+        } else { 
             return true;
         }
     }
@@ -63,18 +59,15 @@ class Register extends React.Component {
 
     displayErrors = errors => errors.map((error, i) => <p key={i}>{error.message}</p>)
 
-
     handleChange= (e) => {
         this.setState({ [e.target.name]: e.target.value })
     }
 
     handleSubmit = (e) => {
-        //makes sure that all of the fiels are filled out
         e.preventDefault();
         if(this.isFormValid()) {
             this.setState({ errros: [], loading: true });
         firebase 
-        //make use of auth tools
         .auth()
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
         .then(createdUser => {
@@ -110,7 +103,6 @@ saveUser = createdUser => {
 handleInputError = (errors, inputName) => {
     return errors.some(error => error.message.toLowerCase().includes(inputName)) ? 'error' : ''
 }
-
 
     render() {
         const { 
@@ -184,13 +176,10 @@ handleInputError = (errors, inputName) => {
                             </Button>
                        </Segment>
                    </Form>
-                   {/* //display any errors */}
                    
                    {errors.length > 0 && (
-                    //if is > 0, show user message
                        <Message error>
                            <h3>Error</h3>
-                           {/* passing errors array from state */}
                            {this.displayErrors(errors)}
                        </Message>
                    )}
