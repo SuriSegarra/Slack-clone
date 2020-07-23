@@ -15,4 +15,4 @@ const ProgressBar = ({ uploadState, percentUploaded }) => (
     )
 );
 
-    export default ProgressBar;
+export default ProgressBar;
